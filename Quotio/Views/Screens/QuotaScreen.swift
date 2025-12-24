@@ -283,9 +283,13 @@ private struct SubscriptionBadge: View {
 private struct ModelQuotaRow: View {
     let model: ModelQuota
     
+    private var remainingPercent: Int {
+        model.percentage
+    }
+    
     private var tint: Color {
-        if model.usedPercentage < 50 { return .green }
-        if model.usedPercentage < 80 { return .orange }
+        if remainingPercent > 50 { return .green }
+        if remainingPercent > 20 { return .orange }
         return .red
     }
     
@@ -299,7 +303,7 @@ private struct ModelQuotaRow: View {
                 Spacer()
                 
                 HStack(spacing: 12) {
-                    Text(verbatim: "\(model.usedPercentage)%")
+                    Text(verbatim: "\(remainingPercent)%")
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundStyle(tint)
@@ -327,7 +331,7 @@ private struct ModelQuotaRow: View {
                         .fill(.quaternary)
                     Capsule()
                         .fill(tint.gradient)
-                        .frame(width: proxy.size.width * min(1, Double(model.usedPercentage) / 100))
+                        .frame(width: proxy.size.width * min(1, Double(remainingPercent) / 100))
                 }
             }
             .frame(height: 10)

@@ -189,6 +189,19 @@ struct LocalizedStrings {
         "import.selectFile": [.english: "Select JSON File", .vietnamese: "Chọn tệp JSON"],
         "import.success": [.english: "Key imported successfully", .vietnamese: "Đã nhập khóa thành công"],
         "import.failed": [.english: "Import failed", .vietnamese: "Nhập thất bại"],
+        
+        // Menu Bar
+        "menubar.running": [.english: "Proxy Running", .vietnamese: "Proxy đang chạy"],
+        "menubar.stopped": [.english: "Proxy Stopped", .vietnamese: "Proxy đã dừng"],
+        "menubar.accounts": [.english: "Accounts", .vietnamese: "Tài khoản"],
+        "menubar.requests": [.english: "Requests", .vietnamese: "Yêu cầu"],
+        "menubar.success": [.english: "Success", .vietnamese: "Thành công"],
+        "menubar.providers": [.english: "Providers", .vietnamese: "Nhà cung cấp"],
+        "menubar.noProviders": [.english: "No providers connected", .vietnamese: "Chưa kết nối nhà cung cấp"],
+        "menubar.andMore": [.english: "+{count} more...", .vietnamese: "+{count} nữa..."],
+        "menubar.openApp": [.english: "Open Quotio", .vietnamese: "Mở Quotio"],
+        "menubar.quit": [.english: "Quit Quotio", .vietnamese: "Thoát Quotio"],
+        "menubar.quota": [.english: "Quota Usage", .vietnamese: "Sử dụng hạn mức"],
     ]
     
     static func get(_ key: String, language: AppLanguage) -> String {

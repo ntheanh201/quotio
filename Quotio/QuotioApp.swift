@@ -10,9 +10,10 @@ import ServiceManagement
 struct QuotioApp: App {
     @State private var viewModel = QuotaViewModel()
     @AppStorage("autoStartProxy") private var autoStartProxy = false
+    @Environment(\.openWindow) private var openWindow
     
     var body: some Scene {
-        WindowGroup {
+        Window("Quotio", id: "main") {
             ContentView()
                 .environment(viewModel)
                 .task {
@@ -22,13 +23,43 @@ struct QuotioApp: App {
                 }
         }
         .defaultSize(width: 1000, height: 700)
+        .commands {
+            CommandGroup(replacing: .newItem) { }
+        }
         
         #if os(macOS)
+        MenuBarExtra {
+            MenuBarView()
+                .environment(viewModel)
+        } label: {
+            MenuBarLabel(
+                isRunning: viewModel.proxyManager.proxyStatus.running,
+                readyAccounts: viewModel.readyAccounts,
+                totalAccounts: viewModel.totalAccounts
+            )
+        }
+        .menuBarExtraStyle(.window)
+        
         Settings {
             AppSettingsView()
                 .environment(viewModel)
         }
         #endif
+    }
+}
+
+// MARK: - Menu Bar Label
+
+struct MenuBarLabel: View {
+    let isRunning: Bool
+    let readyAccounts: Int
+    let totalAccounts: Int
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: isRunning ? "gauge.with.dots.needle.67percent" : "gauge.with.dots.needle.0percent")
+                .symbolRenderingMode(.hierarchical)
+        }
     }
 }
 

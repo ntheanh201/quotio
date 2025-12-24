@@ -27,7 +27,7 @@ struct QuotaCard: View {
         return quotaData.values.contains { !$0.models.isEmpty }
     }
     
-    private var aggregatedModels: [String: (usedPercent: Double, resetTime: String, count: Int)] {
+    private var aggregatedModels: [String: (remainingPercent: Double, resetTime: String, count: Int)] {
         guard let quotaData = quotaData else { return [:] }
         
         var result: [String: (total: Double, resetTime: String, count: Int)] = [:]
@@ -36,7 +36,7 @@ struct QuotaCard: View {
             for model in data.models {
                 let existing = result[model.name] ?? (total: 0, resetTime: model.formattedResetTime, count: 0)
                 result[model.name] = (
-                    total: existing.total + Double(model.usedPercentage),
+                    total: existing.total + Double(model.percentage),
                     resetTime: model.formattedResetTime,
                     count: existing.count + 1
                 )
@@ -44,7 +44,7 @@ struct QuotaCard: View {
         }
         
         return result.mapValues { value in
-            (usedPercent: value.total / Double(max(value.count, 1)), resetTime: value.resetTime, count: value.count)
+            (remainingPercent: value.total / Double(max(value.count, 1)), resetTime: value.resetTime, count: value.count)
         }
     }
     
@@ -105,9 +105,9 @@ struct QuotaCard: View {
                     let displayName = ModelQuota(name: modelName, percentage: 0, resetTime: "").displayName
                     QuotaSection(
                         title: displayName,
-                        usedPercent: data.usedPercent,
+                        remainingPercent: data.remainingPercent,
                         resetTime: data.resetTime,
-                        tint: data.usedPercent < 50 ? .green : (data.usedPercent < 80 ? .orange : .red)
+                        tint: data.remainingPercent > 50 ? .green : (data.remainingPercent > 20 ? .orange : .red)
                     )
                 }
             }
@@ -120,31 +120,30 @@ struct QuotaCard: View {
         VStack(spacing: 12) {
             QuotaSection(
                 title: "Session",
-                usedPercent: sessionUsedPercent,
+                remainingPercent: sessionRemainingPercent,
                 resetTime: sessionResetTime,
-                tint: sessionUsedPercent < 50 ? .green : (sessionUsedPercent < 80 ? .orange : .red)
+                tint: sessionRemainingPercent > 50 ? .green : (sessionRemainingPercent > 20 ? .orange : .red)
             )
             
             if provider == .claude || provider == .codex {
                 QuotaSection(
                     title: "Weekly",
-                    usedPercent: weeklyUsedPercent,
+                    remainingPercent: weeklyRemainingPercent,
                     resetTime: weeklyResetTime,
-                    tint: weeklyUsedPercent < 50 ? .green : (weeklyUsedPercent < 80 ? .orange : .red)
+                    tint: weeklyRemainingPercent > 50 ? .green : (weeklyRemainingPercent > 20 ? .orange : .red)
                 )
             }
         }
     }
     
-    private var sessionUsedPercent: Double {
-        guard !accounts.isEmpty else { return 0 }
-        let usedCount = accounts.filter { $0.status == "cooling" || $0.status == "error" }.count
-        return Double(usedCount) / Double(accounts.count) * 100
+    private var sessionRemainingPercent: Double {
+        guard !accounts.isEmpty else { return 100 }
+        let readyCount = accounts.filter { $0.status == "ready" && !$0.disabled }.count
+        return Double(readyCount) / Double(accounts.count) * 100
     }
     
-    private var weeklyUsedPercent: Double {
-        let errorRatio = Double(errorCount) / Double(max(accounts.count, 1))
-        return min(100, errorRatio * 100 + sessionUsedPercent * 0.3)
+    private var weeklyRemainingPercent: Double {
+        100 - min(100, Double(errorCount) / Double(max(accounts.count, 1)) * 100 + (100 - sessionRemainingPercent) * 0.3)
     }
     
     private var sessionResetTime: String {
@@ -210,7 +209,7 @@ struct QuotaCard: View {
 
 private struct QuotaSection: View {
     let title: String
-    let usedPercent: Double
+    let remainingPercent: Double
     let resetTime: String
     let tint: Color
     
@@ -224,7 +223,7 @@ private struct QuotaSection: View {
                 Spacer()
                 
                 HStack(spacing: 8) {
-                    Text(verbatim: "\(Int(usedPercent))% used")
+                    Text(verbatim: "\(Int(remainingPercent))% left")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     
@@ -248,7 +247,7 @@ private struct QuotaSection: View {
                         .fill(.quaternary)
                     Capsule()
                         .fill(tint.gradient)
-                        .frame(width: proxy.size.width * min(1, usedPercent / 100))
+                        .frame(width: proxy.size.width * min(1, remainingPercent / 100))
                 }
             }
             .frame(height: 8)
@@ -293,9 +292,9 @@ private struct AccountRow: View {
             if let quotaData = quotaData, !quotaData.models.isEmpty {
                 HStack(spacing: 4) {
                     ForEach(quotaData.models.prefix(2)) { model in
-                        Text(verbatim: "\(model.usedPercentage)%")
+                        Text(verbatim: "\(model.percentage)%")
                             .font(.caption2)
-                            .foregroundStyle(model.usedPercentage < 50 ? .green : (model.usedPercentage < 80 ? .orange : .red))
+                            .foregroundStyle(model.percentage > 50 ? .green : (model.percentage > 20 ? .orange : .red))
                     }
                 }
             } else if let statusMessage = account.statusMessage, !statusMessage.isEmpty {
