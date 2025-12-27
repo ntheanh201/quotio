@@ -241,6 +241,15 @@ struct LocalizedStrings {
         "settings.menubar.noQuotaData": [.english: "No quota data available. Add accounts with quota support.", .vietnamese: "Không có dữ liệu quota. Thêm tài khoản hỗ trợ quota."],
         "settings.menubar.help": [.english: "Choose which accounts to show in the menu bar. Maximum 3 items will be displayed.", .vietnamese: "Chọn tài khoản muốn hiển thị trên thanh menu. Tối đa 3 mục."],
         
+        // Quota Display Mode Settings
+        "settings.quota.display": [.english: "Quota Display", .vietnamese: "Hiển thị Quota"],
+        "settings.quota.display.help": [.english: "Choose how to display quota percentages across the app.", .vietnamese: "Chọn cách hiển thị phần trăm quota trong ứng dụng."],
+        "settings.quota.displayMode": [.english: "Display Mode", .vietnamese: "Chế độ hiển thị"],
+        "settings.quota.displayMode.used": [.english: "Used", .vietnamese: "Đã dùng"],
+        "settings.quota.displayMode.remaining": [.english: "Remaining", .vietnamese: "Còn lại"],
+        "settings.quota.used": [.english: "used", .vietnamese: "đã dùng"],
+        "settings.quota.left": [.english: "left", .vietnamese: "còn lại"],
+        
         // Notifications
         "settings.notifications": [.english: "Notifications", .vietnamese: "Thông báo"],
         "settings.notifications.enabled": [.english: "Enable Notifications", .vietnamese: "Bật thông báo"],

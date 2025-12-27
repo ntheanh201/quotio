@@ -696,6 +696,8 @@ private struct UsageRowV2: View {
     let limit: Int?
     let resetTime: String
     
+    @State private var settings = MenuBarSettingsManager.shared
+    
     private var isUnknown: Bool {
         usedPercent < 0 || usedPercent > 100
     }
@@ -712,6 +714,9 @@ private struct UsageRowV2: View {
     }
     
     var body: some View {
+        let displayMode = settings.quotaDisplayMode
+        let displayPercent = displayMode == .used ? usedPercent : remainingPercent
+        
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 // Model name with icon
@@ -746,7 +751,7 @@ private struct UsageRowV2: View {
                     
                     // Percentage with color
                     if !isUnknown {
-                        Text(String(format: "%.0f%% used", usedPercent))
+                        Text(String(format: "%.0f%% %@", displayPercent, displayMode.suffixKey.localized()))
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundStyle(statusColor)

@@ -167,6 +167,9 @@ struct SettingsScreen: View {
             // Notifications
             NotificationSettingsSection()
             
+            // Quota Display
+            QuotaDisplaySettingsSection()
+            
             // Menu Bar
             MenuBarSettingsSection()
             
@@ -445,6 +448,33 @@ struct NotificationSettingsSection: View {
             Label("settings.notifications".localized(), systemImage: "bell")
         } footer: {
             Text("settings.notifications.help".localized())
+        }
+    }
+}
+
+// MARK: - Quota Display Settings Section
+
+struct QuotaDisplaySettingsSection: View {
+    @State private var settings = MenuBarSettingsManager.shared
+    
+    private var displayModeBinding: Binding<QuotaDisplayMode> {
+        Binding(
+            get: { settings.quotaDisplayMode },
+            set: { settings.quotaDisplayMode = $0 }
+        )
+    }
+    
+    var body: some View {
+        Section {
+            Picker("settings.quota.displayMode".localized(), selection: displayModeBinding) {
+                Text("settings.quota.displayMode.used".localized()).tag(QuotaDisplayMode.used)
+                Text("settings.quota.displayMode.remaining".localized()).tag(QuotaDisplayMode.remaining)
+            }
+            .pickerStyle(.segmented)
+        } header: {
+            Label("settings.quota.display".localized(), systemImage: "percent")
+        } footer: {
+            Text("settings.quota.display.help".localized())
         }
     }
 }

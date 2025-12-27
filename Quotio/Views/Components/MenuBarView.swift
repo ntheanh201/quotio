@@ -541,6 +541,8 @@ private struct QuotaAccountRow: View {
 private struct QuotaModelBadge: View {
     let model: ModelQuota
     
+    @State private var settings = MenuBarSettingsManager.shared
+    
     private var remainingPercent: Double {
         model.percentage
     }
@@ -552,6 +554,9 @@ private struct QuotaModelBadge: View {
     }
     
     var body: some View {
+        let displayMode = settings.quotaDisplayMode
+        let displayPercent = displayMode.displayValue(from: remainingPercent)
+        
         VStack(alignment: .leading, spacing: 2) {
             Text(model.displayName)
                 .font(.system(size: 9))
@@ -570,7 +575,7 @@ private struct QuotaModelBadge: View {
                 }
                 .frame(height: 4)
                 
-                Text(model.formattedPercentage)
+                Text(verbatim: "\(Int(displayPercent))%")
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundStyle(tintColor)
                     .frame(width: 36, alignment: .trailing)
@@ -583,6 +588,8 @@ private struct QuotaModelBadge: View {
 private struct GroupedQuotaModelBadge: View {
     let groupedModel: GroupedModelQuota
     
+    @State private var settings = MenuBarSettingsManager.shared
+    
     private var remainingPercent: Double {
         groupedModel.percentage
     }
@@ -594,6 +601,9 @@ private struct GroupedQuotaModelBadge: View {
     }
     
     var body: some View {
+        let displayMode = settings.quotaDisplayMode
+        let displayPercent = displayMode.displayValue(from: remainingPercent)
+        
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 2) {
                 Image(systemName: groupedModel.group.icon)
@@ -618,7 +628,7 @@ private struct GroupedQuotaModelBadge: View {
                 }
                 .frame(height: 4)
                 
-                Text(groupedModel.formattedPercentage)
+                Text(verbatim: "\(Int(displayPercent))%")
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundStyle(tintColor)
                     .frame(width: 36, alignment: .trailing)

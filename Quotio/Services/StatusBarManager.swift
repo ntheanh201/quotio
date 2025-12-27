@@ -141,7 +141,12 @@ struct StatusBarQuotaItemView: View {
     let item: MenuBarQuotaDisplayItem
     let colorMode: MenuBarColorMode
     
+    @State private var settings = MenuBarSettingsManager.shared
+    
     var body: some View {
+        let displayMode = settings.quotaDisplayMode
+        let displayPercent = displayMode.displayValue(from: item.percentage)
+        
         HStack(spacing: 2) {
             if let assetName = item.provider.menuBarIconAsset {
                 Image(assetName)
@@ -155,7 +160,7 @@ struct StatusBarQuotaItemView: View {
                     .fixedSize()
             }
             
-            Text(formatPercentage(item.percentage))
+            Text(formatPercentage(displayPercent))
                 .font(.system(size: 11, weight: .medium, design: .monospaced))
                 .foregroundStyle(colorMode == .colored ? item.statusColor : .primary)
                 .fixedSize()

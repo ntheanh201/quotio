@@ -49,6 +49,38 @@ enum MenuBarColorMode: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+// MARK: - Quota Display Mode
+
+/// Display mode for quota percentage (used vs remaining)
+enum QuotaDisplayMode: String, Codable, CaseIterable, Identifiable {
+    case used = "used"           // Show percentage used (e.g., "75% used")
+    case remaining = "remaining" // Show percentage remaining (e.g., "25% left")
+    
+    var id: String { rawValue }
+    
+    var localizationKey: String {
+        switch self {
+        case .used: return "settings.quota.displayMode.used"
+        case .remaining: return "settings.quota.displayMode.remaining"
+        }
+    }
+    
+    /// Convert a remaining percentage to the display value based on mode
+    func displayValue(from remainingPercent: Double) -> Double {
+        switch self {
+        case .used: return 100 - remainingPercent
+        case .remaining: return remainingPercent
+        }
+    }
+    
+    var suffixKey: String {
+        switch self {
+        case .used: return "settings.quota.used"
+        case .remaining: return "settings.quota.left"
+        }
+    }
+}
+
 // MARK: - Menu Bar Quota Display Item
 
 /// Data for displaying a single quota item in menu bar
@@ -78,6 +110,7 @@ final class MenuBarSettingsManager {
     private let selectedItemsKey = "menuBarSelectedQuotaItems"
     private let colorModeKey = "menuBarColorMode"
     private let showQuotaKey = "menuBarShowQuota"
+    private let quotaDisplayModeKey = "quotaDisplayMode"
     
     /// Whether to show quota in menu bar
     var showQuotaInMenuBar: Bool {
@@ -94,12 +127,18 @@ final class MenuBarSettingsManager {
         didSet { defaults.set(colorMode.rawValue, forKey: colorModeKey) }
     }
     
+    /// Quota display mode (used vs remaining)
+    var quotaDisplayMode: QuotaDisplayMode {
+        didSet { defaults.set(quotaDisplayMode.rawValue, forKey: quotaDisplayModeKey) }
+    }
+    
     /// Maximum number of items to display in menu bar
     let maxDisplayItems = 3
     
     private init() {
         self.showQuotaInMenuBar = defaults.bool(forKey: showQuotaKey)
         self.colorMode = MenuBarColorMode(rawValue: defaults.string(forKey: colorModeKey) ?? "") ?? .colored
+        self.quotaDisplayMode = QuotaDisplayMode(rawValue: defaults.string(forKey: quotaDisplayModeKey) ?? "") ?? .used
         self.selectedItems = Self.loadSelectedItems(from: defaults, key: selectedItemsKey)
     }
     

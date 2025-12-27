@@ -213,7 +213,16 @@ private struct QuotaSection: View {
     let resetTime: String
     let tint: Color
     
+    @State private var settings = MenuBarSettingsManager.shared
+    
+    private var progressWidth: Double {
+        remainingPercent / 100
+    }
+    
     var body: some View {
+        let displayMode = settings.quotaDisplayMode
+        let displayPercent = displayMode.displayValue(from: remainingPercent)
+        
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(title)
@@ -223,7 +232,7 @@ private struct QuotaSection: View {
                 Spacer()
                 
                 HStack(spacing: 8) {
-                    Text(verbatim: "\(Int(remainingPercent))% left")
+                    Text(verbatim: "\(Int(displayPercent))% \(displayMode.suffixKey.localized())")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     
@@ -247,7 +256,7 @@ private struct QuotaSection: View {
                         .fill(.quaternary)
                     Capsule()
                         .fill(tint.gradient)
-                        .frame(width: proxy.size.width * min(1, remainingPercent / 100))
+                        .frame(width: proxy.size.width * min(1, progressWidth))
                 }
             }
             .frame(height: 8)
